@@ -1,0 +1,40 @@
+name: Normalize Subscriptions
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 * * * *" # hourly
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Build
+        run: |
+          go build -o xsr ./cmd/xraysubrefiner
+
+      - name: Run
+        run: |
+          ./xsr -config config.yaml -out export
+
+      - name: Commit & push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add export
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: update exports [skip ci]"
+            git push
+          else
+            echo "No changes to commit"
+          fi
