@@ -25,3 +25,5 @@ subscriptions:
     url: "https://raw.githubusercontent.com/itsyebekhe/PSG/main/lite/subscriptions/xray/normal/mix"
   - key: "hamedP"
     url: "https://cdn.jsdelivr.net/gh/hamedp-71/Sub_Checker_Creator@main/final.txt"
+  - key: "soliSpirit"
+    url: "https://raw.githubusercontent.com/SoliSpirit/v2ray-configs/refs/heads/main/all_configs.txt"
