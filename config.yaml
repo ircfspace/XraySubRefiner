@@ -27,3 +27,7 @@ subscriptions:
     url: "https://cdn.jsdelivr.net/gh/hamedp-71/Sub_Checker_Creator@main/final.txt"
   - key: "soliSpirit"
     url: "https://raw.githubusercontent.com/SoliSpirit/v2ray-configs/refs/heads/main/all_configs.txt"
+  - key: "matinGh"
+    url: "https://raw.githubusercontent.com/MatinGhanbari/v2ray-configs/main/subscriptions/v2ray/super-sub.txt"
+  - key: "daniSamadi"
+    url: "https://raw.githubusercontent.com/Danialsamadi/v2go/main/All_Configs_Sub.txt"
