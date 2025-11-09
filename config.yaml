@@ -31,3 +31,5 @@ subscriptions:
     url: "https://raw.githubusercontent.com/MatinGhanbari/v2ray-configs/main/subscriptions/v2ray/super-sub.txt"
   - key: "daniSamadi"
     url: "https://raw.githubusercontent.com/Danialsamadi/v2go/main/All_Configs_Sub.txt"
+  - key: "gameFssociety"
+    url: "https://raw.githubusercontent.com/parvinxs/Game/refs/heads/main/Sub_game_fssociety"
