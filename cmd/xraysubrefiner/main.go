@@ -37,6 +37,7 @@ type Config struct {
 	AllowedSchemes []string       `yaml:"allowed_schemes"`
 	Lite           LiteCfg        `yaml:"lite"`
 	Subscriptions  []Subscription `yaml:"subscriptions"`
+	Locations  []Subscription `yaml:"locations"`
 }
 
 var (
@@ -73,7 +74,8 @@ func main() {
 		}
 	}
 
-	for _, sub := range cfg.Subscriptions {
+	allSubs := append(cfg.Subscriptions, cfg.Locations...)
+	for _, sub := range allSubs {
 		fmt.Printf("Processing %s (%s)\n", sub.Key, sub.URL)
 		raw, err := fetch(client, sub.URL)
 		if err != nil {
