@@ -89,16 +89,16 @@ func main() {
 		normal := dedupe(valid)
 		lite := buildLiteTail(normal, 100) // take last 100 preserving order
 
-		keyDir := filepath.Join(*outDir, sanitizeFileName(sub.Key))
+		keyDir := filepath.Join(*outDir, sub.Key)
 		if err := os.MkdirAll(keyDir, 0o755); err != nil {
 			must(err)
 		}
 
 		// Write Base64-encoded outputs (no file extension)
-		if err := writeBase64Sorted(filepath.Join(keyDir, "normal"), normal); err != nil {
-			must(err)
+		if err := writeBase64Sorted(filepath.Join(keyDir, sanitizeFileName("normal")), normal); err != nil {
+    		must(err)
 		}
-		if err := writeBase64NoSort(filepath.Join(keyDir, "lite"), lite); err != nil {
+		if err := writeBase64NoSort(filepath.Join(keyDir, sanitizeFileName("lite")), lite); err != nil {
 			must(err)
 		}
 	}
