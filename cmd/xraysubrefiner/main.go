@@ -353,7 +353,8 @@ func writeBase64Atomic(path string, lines []string) error {
 
 func sanitizeFileName(name string) string {
 	name = strings.TrimSpace(name)
-	invalid := regexp.MustCompile(`[<>:"/\\|?*\x00-\x1F]`)
+	name = strings.ReplaceAll(name, "/", "_")
+	invalid := regexp.MustCompile(`[<>:"\\|?*\x00-\x1F]`)
 	name = invalid.ReplaceAllString(name, "_")
 	if name == "" {
 		name = "default"
