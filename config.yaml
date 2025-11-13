@@ -47,8 +47,6 @@ locations:
     url: "https://raw.githubusercontent.com/itsyebekhe/PSG/main/lite/subscriptions/location/base64/RU"
   - key: "location/CN"
     url: "https://raw.githubusercontent.com/itsyebekhe/PSG/main/lite/subscriptions/location/base64/CN"
-  - key: "location/UA"
-    url: "https://raw.githubusercontent.com/itsyebekhe/PSG/main/lite/subscriptions/location/base64/UA"
   - key: "location/FI"
     url: "https://raw.githubusercontent.com/itsyebekhe/PSG/main/lite/subscriptions/location/base64/FI"
   - key: "location/FR"

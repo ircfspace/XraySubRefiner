@@ -26,7 +26,6 @@ type Subscription struct {
 }
 
 type LiteCfg struct {
-	// Kept for compatibility with config structure; Lite always takes last N now.
 	Strategy     string `yaml:"strategy"`
 	MaxTotal     int    `yaml:"max_total"`
 	PerHostLimit int    `yaml:"per_host_limit"`
@@ -45,7 +44,6 @@ var (
 	reCommentLine = regexp.MustCompile(`^\s*(#|//|;).*$`)
 )
 
-// must: fail fast on unexpected errors.
 func must(err error) {
 	if err != nil {
 		log.Fatal(err)
@@ -63,7 +61,6 @@ func main() {
 
 	client := &http.Client{Timeout: *timeout}
 
-	// Allowed schemes set
 	allowed := map[string]struct{}{}
 	for _, s := range cfg.AllowedSchemes {
 		allowed[strings.ToLower(strings.TrimSpace(s))] = struct{}{}
@@ -87,18 +84,24 @@ func main() {
 		valid := parseAndFilterLines(decoded, allowed)
 
 		normal := dedupe(valid)
-		lite := buildLiteTail(normal, 100) // take last 100 preserving order
+		lite := buildLiteTail(normal, 100) 
+		ipv4, ipv6 := splitByIPVersion(normal)
 
 		keyDir := filepath.Join(*outDir, sub.Key)
 		if err := os.MkdirAll(keyDir, 0o755); err != nil {
 			must(err)
 		}
 
-		// Write Base64-encoded outputs (no file extension)
 		if err := writeBase64Sorted(filepath.Join(keyDir, sanitizeFileName("normal")), normal); err != nil {
     		must(err)
 		}
 		if err := writeBase64NoSort(filepath.Join(keyDir, sanitizeFileName("lite")), lite); err != nil {
+			must(err)
+		}
+		if err := writeBase64Sorted(filepath.Join(keyDir, sanitizeFileName("ipv4")), ipv4); err != nil {
+			must(err)
+		}
+		if err := writeBase64Sorted(filepath.Join(keyDir, sanitizeFileName("ipv6")), ipv6); err != nil {
 			must(err)
 		}
 	}
@@ -113,7 +116,6 @@ func loadConfig(path string) (*Config, error) {
 	if err := yaml.Unmarshal(b, &cfg); err != nil {
 		return nil, err
 	}
-	// Reasonable defaults
 	if cfg.Lite.MaxTotal <= 0 {
 		cfg.Lite.MaxTotal = 100
 	}
@@ -170,7 +172,6 @@ func tryDecodeIfBase64(b []byte) []byte {
 func parseAndFilterLines(b []byte, allowed map[string]struct{}) []string {
 	var out []string
 	sc := bufio.NewScanner(bytes.NewReader(b))
-	// Increase Scanner buffer for large lines
 	buf := make([]byte, 0, 1024*1024)
 	sc.Buffer(buf, 10*1024*1024)
 
@@ -260,7 +261,6 @@ func dedupe(in []string) []string {
 	return out
 }
 
-// buildLiteTail returns the last n items from normal, preserving order.
 func buildLiteTail(normal []string, n int) []string {
 	if n <= 0 {
 		n = 100
@@ -272,7 +272,6 @@ func buildLiteTail(normal []string, n int) []string {
 	return append([]string(nil), normal[start:]...)
 }
 
-// hostKey kept for potential future strategies; not used in tail selection.
 func hostKey(line string) string {
 	u, err := url.Parse(line)
 	if err == nil && u.Host != "" {
@@ -290,20 +289,16 @@ func hostKey(line string) string {
 	return strings.ToLower(line)
 }
 
-// writeBase64Sorted writes lines sorted, as a single Base64-encoded payload.
 func writeBase64Sorted(path string, lines []string) error {
 	cp := append([]string(nil), lines...)
 	sort.Strings(cp)
 	return writeBase64Atomic(path, cp)
 }
 
-// writeBase64NoSort writes lines in the given order, as a single Base64-encoded payload.
 func writeBase64NoSort(path string, lines []string) error {
 	return writeBase64Atomic(path, lines)
 }
 
-// writeBase64Atomic joins lines with '\n', encodes the entire content in Base64,
-// then writes atomically with retries (Windows-friendly).
 func writeBase64Atomic(path string, lines []string) error {
 	payload := strings.Join(lines, "\n")
 	encoded := base64.StdEncoding.EncodeToString([]byte(payload))
@@ -334,7 +329,7 @@ func writeBase64Atomic(path string, lines []string) error {
 
 	const maxRetries = 6
 	for i := 0; i < maxRetries; i++ {
-		_ = os.Remove(path) // ignore error if not exists
+		_ = os.Remove(path) 
 		if err := os.Rename(tmpPath, path); err != nil {
 			lower := strings.ToLower(err.Error())
 			busy := strings.Contains(lower, "used by another process") ||
@@ -362,4 +357,28 @@ func sanitizeFileName(name string) string {
 		name = "default"
 	}
 	return name
+}
+
+func splitByIPVersion(lines []string) ([]string, []string) {
+    var ipv4, ipv6 []string
+    for _, l := range lines {
+        u, err := url.Parse(l)
+        if err != nil || u.Host == "" {
+            continue
+        }
+        host := u.Host
+        if strings.Contains(host, ":") {
+            host = strings.Split(host, ":")[0]
+        }
+        if strings.HasPrefix(host, "[") && strings.HasSuffix(host, "]") {
+            ipv6 = append(ipv6, l)
+            continue
+        }
+        if strings.Count(host, ".") == 3 {
+            ipv4 = append(ipv4, l)
+        } else {
+            ipv6 = append(ipv6, l)
+        }
+    }
+    return ipv4, ipv6
 }
