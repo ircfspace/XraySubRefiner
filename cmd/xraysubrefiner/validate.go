@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -46,6 +47,26 @@ func validateLine(line string) error {
 	}
 }
 
+func filterValidLines(lines []string, key string) []string {
+    var out []string
+
+    for idx, raw := range lines {
+        line := strings.TrimSpace(raw)
+        if line == "" {
+            continue
+        }
+
+        if err := validateLine(line); err != nil {
+            fmt.Fprintf(os.Stderr, "!! %s: skip invalid line [%d]: %v\n", key, idx, err)
+            continue
+        }
+
+        out = append(out, line)
+    }
+
+    return out
+}
+
 func validateVmess(line string) error {
     raw := strings.TrimPrefix(line, "vmess://")
 
@@ -76,7 +97,7 @@ func validateVmess(line string) error {
     if err != nil {
         return fmt.Errorf("vmess: %w", err)
     }
-    if port <= 0 || port > 65535 {
+    if port <= 0 || port > 99999 {
         return fmt.Errorf("vmess: invalid port %d", port)
     }
 

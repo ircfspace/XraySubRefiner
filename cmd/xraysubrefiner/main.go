@@ -66,7 +66,7 @@ func main() {
 		allowed[strings.ToLower(strings.TrimSpace(s))] = struct{}{}
 	}
 	if len(allowed) == 0 {
-		for _, s := range []string{"vless", "vmess", "ss"} {
+		for _, s := range []string{"vless", "vmess", "ss", "trojan"} {
 			allowed[s] = struct{}{}
 		}
 	}
@@ -83,24 +83,35 @@ func main() {
 		decoded := tryDecodeIfBase64(raw)
 		valid := parseAndFilterLines(decoded, allowed)
 
-		
 		normal := dedupe(valid)
+		normal = filterValidLines(normal, sub.Key)
 
-		if err := validateLines(normal, sub.Key); err != nil {
-			fmt.Fprintf(os.Stderr, "!! validation error for %s: %v\n", sub.Key, err)
-			os.Exit(1)
+		fmt.Fprintf(os.Stderr, "Info: %s -> %d lines after validation\n", sub.Key, len(normal))
+		if len(normal) == 0 {
+			fmt.Fprintf(os.Stderr, "Info: %s has no valid configs after validation, skipping\n", sub.Key)
+			continue
 		}
 
-		lite := buildLiteTail(normal, 100) 
-		ipv4, ipv6 := splitByIPVersion(normal)
+		reachable := filterReachableLines(normal, 2*time.Second, 50)
+
+		fmt.Fprintf(os.Stderr, "Info: %s -> %d syntactically valid, %d reachable\n",
+			sub.Key, len(normal), len(reachable))
+
+		if len(reachable) == 0 {
+			fmt.Fprintf(os.Stderr, "Info: %s has no reachable endpoints, skipping exports\n", sub.Key)
+			continue
+		}
+
+		lite := buildLiteTail(reachable, 100)
+		ipv4, ipv6 := splitByIPVersion(reachable)
 
 		keyDir := filepath.Join(*outDir, sub.Key)
 		if err := os.MkdirAll(keyDir, 0o755); err != nil {
 			must(err)
 		}
 
-		if err := writeBase64Sorted(filepath.Join(keyDir, sanitizeFileName("normal")), normal); err != nil {
-    		must(err)
+		if err := writeBase64Sorted(filepath.Join(keyDir, sanitizeFileName("normal")), reachable); err != nil {
+			must(err)
 		}
 		if err := writeBase64NoSort(filepath.Join(keyDir, sanitizeFileName("lite")), lite); err != nil {
 			must(err)
@@ -111,6 +122,7 @@ func main() {
 		if err := writeBase64Sorted(filepath.Join(keyDir, sanitizeFileName("ipv6")), ipv6); err != nil {
 			must(err)
 		}
+
 	}
 }
 
