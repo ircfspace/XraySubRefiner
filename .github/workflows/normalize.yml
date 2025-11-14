@@ -3,7 +3,7 @@ name: Normalize Subscriptions
 on:
   workflow_dispatch: {}
   schedule:
-    - cron: "0 * * * *" # hourly
+    - cron: "0 */3 * * *"
 
 jobs:
   build-and-run:
