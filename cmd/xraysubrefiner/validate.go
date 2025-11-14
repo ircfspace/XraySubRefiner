@@ -203,30 +203,30 @@ func validateShadowsocks(line string) error {
 		return errors.New("missing userinfo (method:password)")
 	}
 
-	method, password, err := decodeSSUserInfo(user)
+	method, err := decodeSSUserInfo(user)
 	if err != nil {
 		return err
 	}
 	if method == "" {
 		return errors.New("empty encryption method")
 	}
-	if password == "" {
+	/*if password == "" {
 		return errors.New("empty password")
-	}
+	}*/
 	return nil
 }
 
-func decodeSSUserInfo(user string) (method, password string, err error) {
+func decodeSSUserInfo(user string) (method string, err error) {
 	if dec, decErr := base64.StdEncoding.DecodeString(user); decErr == nil {
 		if parts := strings.SplitN(string(dec), ":", 2); len(parts) == 2 {
-			return parts[0], parts[1], nil
+			return parts[0], nil
 		}
 	}
-	if !strings.Contains(user, ":") {
+	/*if !strings.Contains(user, ":") {
 		return "", "", errors.New("userinfo is neither valid base64 nor method:password")
-	}
+	}*/
 	parts := strings.SplitN(user, ":", 2)
-	return parts[0], parts[1], nil
+	return parts[0], nil
 }
 
 func parsePort(p string) (int, error) {
