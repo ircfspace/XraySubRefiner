@@ -83,7 +83,14 @@ func main() {
 		decoded := tryDecodeIfBase64(raw)
 		valid := parseAndFilterLines(decoded, allowed)
 
+		
 		normal := dedupe(valid)
+
+		if err := validateLines(normal, sub.Key); err != nil {
+			fmt.Fprintf(os.Stderr, "!! validation error for %s: %v\n", sub.Key, err)
+			os.Exit(1)
+		}
+
 		lite := buildLiteTail(normal, 100) 
 		ipv4, ipv6 := splitByIPVersion(normal)
 
