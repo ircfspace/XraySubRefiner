@@ -25,9 +25,11 @@ It runs locally or as a GitHub Actions workflow (hourly + manual dispatch).
 3. Split into individual URIs, ignore comments/blank lines.
 4. Keep only URIs that start with allowed schemes.
 5. Normalize schemes to lowercase and deduplicate.
-6. Produce two outputs per key:
+6. Produce four outputs per key:
    - **normal**: all valid entries, sorted, **Base64-encoded**.
    - **lite**: last 100 items (newest at end), **in original order**, **Base64-encoded**.
+   - **IPv4**: all valid IPv4 entries, sorted, Base64-encoded.
+   - **IPv6**: all valid IPv6 entries, sorted, Base64-encoded.
 
 ## Requirements
 
