@@ -31,6 +31,8 @@ subscriptions:
     url: "https://raw.githubusercontent.com/Danialsamadi/v2go/main/All_Configs_Sub.txt"
   - key: "gameFssociety"
     url: "https://raw.githubusercontent.com/parvinxs/Game/refs/heads/main/Sub_game_fssociety"
+  - key: "goidaVpn"
+    url: "https://raw.githubusercontent.com/AvenCores/goida-vpn-configs/refs/heads/main/githubmirror/18.txt"
 
 locations:
   - key: "location/DE"
