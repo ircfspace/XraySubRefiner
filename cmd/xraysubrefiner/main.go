@@ -61,14 +61,18 @@ func main() {
 
 	client := &http.Client{Timeout: *timeout}
 
-	allowed := map[string]struct{}{}
-	for _, s := range cfg.AllowedSchemes {
-		allowed[strings.ToLower(strings.TrimSpace(s))] = struct{}{}
+	allowed := make(map[string]struct{})
+
+	if len(cfg.AllowedSchemes) == 0 {
+		log.Fatal("allowed_schemes is missing or empty in config.yaml")
 	}
-	if len(allowed) == 0 {
-		for _, s := range []string{"vless", "vmess", "ss", "trojan"} {
-			allowed[s] = struct{}{}
+
+	for _, s := range cfg.AllowedSchemes {
+		s = strings.ToLower(strings.TrimSpace(s))
+		if s == "" {
+			log.Fatal("allowed_schemes contains an empty value in config.yaml")
 		}
+		allowed[s] = struct{}{}
 	}
 
 	allSubs := append(cfg.Subscriptions, cfg.Locations...)
