@@ -25,17 +25,17 @@ jobs:
 
       - name: Run
         run: |
+          mkdir -p ./export
           ./xsr -config config.yaml -out export
 
       - name: Commit & push changes
         run: |
+          cd ./export
+          git init
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f export
-          git status --porcelain
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: update exports [skip ci]"
-            git push
-          else
-            echo "No changes to commit"
-          fi
+          git remote add origin https://github-action:$GITHUB_TOKEN@github.com/ircfspace/XraySubRefiner.git
+          git branch -M export
+          git add .
+          git commit -m "Update export"
+          git push -f origin export

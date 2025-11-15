@@ -35,6 +35,4 @@ profile.*
 
 # Exports:
 # Ignore everything under export/
-export/**
-!export/.keepme
-!export/.keepme/**
+export/
