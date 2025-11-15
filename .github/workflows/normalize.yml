@@ -30,12 +30,10 @@ jobs:
 
       - name: Commit & push changes
         run: |
-          cd ./export
-          git init
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git remote add origin https://x-access-token:${GITHUB_TOKEN}@github.com/ircfspace/XraySubRefiner.git
-          git branch -M export
-          git add .
-          git commit -m "Update export"
-          git push -f origin export
+
+          git add export
+          git commit -m "Update export" || echo "No changes to commit"
+
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/ircfspace/XraySubRefiner.git HEAD:export -f
