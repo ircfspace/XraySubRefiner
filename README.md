@@ -1,9 +1,6 @@
 # XraySubRefiner
 
-A small Go utility to **normalize** multiple Xray/V2Ray/SS/Trojan subscription sources and export two lists per subscription key:
-
-- `export/<key>/normal` — **Base64-encoded** full list (filtered + deduped, sorted)
-- `export/<key>/lite` — **Base64-encoded** lite list (the **last 100** items from the normalized list, preserving order)
+A small Go utility to normalize multiple Xray/V2Ray/SS/Trojan subscription sources and generate four output lists for each subscription key.
 
 It runs locally or as a GitHub Actions workflow (hourly + manual dispatch).
 
