@@ -38,4 +38,4 @@ jobs:
           git branch -M export
           git add .
           git commit -m "Update export"
-          git push -f origin exportace/XraySubRefiner.git HEAD:export -f
+          git push -f origin export
